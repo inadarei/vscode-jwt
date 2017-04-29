@@ -1,0 +1,67 @@
+{
+  "name": "jwt",
+  "displayName": "jwt",
+  "description": "Jason Web Token (jwt) encoder/decoder.",
+  "version": "0.0.1",
+  "publisher": "inadarei",
+  "engines": {
+    "vscode": "^1.11.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:extension.encodeJWT",
+    "onCommand:extension.decodeJWT"
+  ],
+  "main": "./extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.encodeJWT",
+        "title": "JWT: Encode"
+      },
+      {
+        "command": "extension.decodeJWT",
+        "title": "JWT: Decode"
+      }
+    ],
+    "configuration": {
+        "type": "object",
+        "title": "JWT Encode/Decode configuration",
+        "properties": {
+            "jwt.secret": {
+                "type": ["string", "null"],
+                "default": "unsigned",
+                "description": "A shared secret or a private key for signing JWT tokens."
+            },
+            "jwt.pubKey": {
+                "type": ["string", "null"],
+                "default": null,
+                "description": "A public key for verifying JWT tokens, if using asymmetric verification"
+            },            
+            "jwt.duration": {
+                "type": ["string"],
+                "default": "24h",
+                "description": "Duration for JWT tokens."
+            }
+        }
+    }
+  },
+  "scripts": {
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "typescript": "^2.0.3",
+    "vscode": "^1.0.0",
+    "mocha": "^2.3.3",
+    "eslint": "^3.6.0",
+    "@types/node": "^6.0.40",
+    "@types/mocha": "^2.2.32"
+  },
+  "dependencies": {
+    "copy-paste": "^1.3.0",
+    "jsonwebtoken": "^7.4.0"
+  }
+}
