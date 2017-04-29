@@ -7,7 +7,7 @@ Makes it easy to sign and verify JWT tokens in VS Code.
 1. Sign a JWT token using a shared secret or a private key (set in extension settings)
 2. Verify a JWT token using a shared secret or public key (set in extension settings)
 
-\!\[feature X\]\(img/jwt-extension.png\)
+![Using JWT](img/jwt-extension.png)
 
 ## Extension Settings
 
