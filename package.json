@@ -1,9 +1,9 @@
 {
   "name": "jwt",
   "displayName": "jwt",
-  "description": "Jason Web Token (jwt) sign/verify utility.",
+  "description": "JSON Web Token (jwt) sign/verify utility.",
   "keywords": ["jwt", "json", "token", "json web token", "encoder"],
-  "version": "0.0.1",
+  "version": "1.0.0",
   "publisher": "inadarei",
   "engines": {
     "vscode": "^1.11.0"
