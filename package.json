@@ -2,7 +2,7 @@
   "name": "jwt",
   "displayName": "jwt",
   "description": "Jason Web Token (jwt) sign/verify utility.",
-  "keywords": ["jwt", "json", "token", "json web token", "encoder", "sign", "verify"],
+  "keywords": ["jwt", "json", "token", "json web token", "encoder"],
   "version": "0.0.1",
   "publisher": "inadarei",
   "engines": {
