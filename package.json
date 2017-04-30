@@ -3,7 +3,7 @@
   "displayName": "JWT Sign/Verify",
   "description": "JSON Web Token (JWT) Sign/Verify Utility.",
   "keywords": ["jwt", "json", "token", "json web token", "encoder"],
-  "version": "1.0.3",
+  "version": "1.0.4",
   "publisher": "inadarei",
   "engines": {
     "vscode": "^1.11.0"
@@ -53,6 +53,11 @@
         }
     }
   },
+  "icon": "img/logo.png",
+  "galleryBanner": {
+    "color": "#252526",
+    "theme": "dark"
+  },  
   "scripts": {
     "postinstall": "node ./node_modules/vscode/bin/install",
     "test": "node ./node_modules/vscode/bin/test"
