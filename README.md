@@ -1,6 +1,8 @@
 # JWT Extension for VS Code
 
-Makes it easy to sign and verify JWT tokens in VS Code.
+[![Code Climate Badge][codeclimate-img]][codeclimate-url]
+
+Makes it easy to sign (generate) and verify (decode) JWT tokens in VS Code.
 
 ## Features
 
@@ -19,6 +21,10 @@ This extension contributes the following settings:
 
 ## Release Notes
 
+### 1.2.0
+
+Added command with duration presets to easily generate tokens of various durations.
+
 ### 1.1.0
 
 Major improvement: properly supporting JSON and plain-text payloads.
@@ -29,3 +35,11 @@ Initial release.
 
 
 **Enjoy!**
+
+
+## License
+
+[MIT](LICENSE)
+
+[codeclimate-img]: https://codeclimate.com/github/inadarei/vscode-jwt/badges/gpa.svg
+[codeclimate-url]: https://codeclimate.com/github/inadarei/vscode-jwt

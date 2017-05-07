@@ -17,7 +17,8 @@
   },
   "activationEvents": [
     "onCommand:extension.encodeJWT",
-    "onCommand:extension.decodeJWT"
+    "onCommand:extension.decodeJWT",
+    "onCommand:extension.encodeJWTPresets"
   ],
   "main": "./extension",
   "contributes": {
@@ -29,6 +30,10 @@
       {
         "command": "extension.decodeJWT",
         "title": "JWT: Verify (Decode)"
+      },
+      {
+        "command": "extension.encodeJWTPresets",
+        "title": "JWT(with Presets): Sign (Encode)"
       }
     ],
     "configuration": {

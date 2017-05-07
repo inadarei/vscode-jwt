@@ -13,41 +13,31 @@ function activate(context) {
     var config = vscode.workspace.getConfiguration('jwt');
 
     //console.log(config);
+        // The command has been defined in the package.json file
+    // The commandId parameter must match the command field in package.json
+    disposables.push( vscode.commands.registerCommand('extension.encodeJWTPresets', function () {
+      var options = {
+        'Token Duration: One Hour' : '1h',  
+        'Token Duration: One Day' : '1d',
+        'Token Duration: One Week' : '7d',
+        'Token Duration: One Month (30 days)' : '30d',
+        'Token Duration: Three Months (90 days)' : '90d',
+        'Token Duration: Six Months (180 days)' : '180d'
+      };
+
+      vscode.window.showQuickPick(Object.keys(options)).then((selection) => {
+        if (selection) {
+          var duration = options[selection];
+          generateToken(config, duration);
+        }        
+      });
+
+    }));
 
     // The command has been defined in the package.json file
     // The commandId parameter must match the command field in package.json
     disposables.push( vscode.commands.registerCommand('extension.encodeJWT', function () {
-        var srcText = getSelectionText();
-        if (!srcText) return; // nothing to do
-
-        var toEncode;
-        var errParsingJSON = false;
-
-        try {
-            // Let's see if the input is a valid JSON
-            toEncode = JSON.parse(srcText);
-        } catch (Err) {
-            errParsingJSON = true;
-            toEncode = srcText;
-            vscode.window.showInformationMessage("Couldn't parse input as JSON. Assuming plain text and disabling expiration.");
-        }
-
-        try {
-          var token;
-          if (errParsingJSON) {
-            // NOTE: plaintext payloads don't support expiration  
-            token =  jwt.sign(toEncode, config.secret);
-          } else {
-            token =  jwt.sign(toEncode, config.secret, { expiresIn: config.duration });
-          }
-
-          ncp.copy(token, function () {
-              var infoMsg = 'Encoded JWT token copied to clipboard!';
-              vscode.window.showInformationMessage(infoMsg);
-          });          
-        } catch (Err) {
-          vscode.window.showInformationMessage("Error encoding to JWT: " + Err);
-        }
+      generateToken(config);
     }));
 
     disposables.push( vscode.commands.registerCommand('extension.decodeJWT', function () {
@@ -78,6 +68,41 @@ exports.activate = activate;
 
 // this method is called when your extension is deactivated
 function deactivate() {
+}
+
+function generateToken(config, duration = false) {
+  var _duration = duration || config.duration;
+  var srcText = getSelectionText();
+  if (!srcText) return; // nothing to do
+
+  var toEncode;
+  var errParsingJSON = false;
+
+  try {
+      // Let's see if the input is a valid JSON
+      toEncode = JSON.parse(srcText);
+  } catch (Err) {
+      errParsingJSON = true;
+      toEncode = srcText;
+      vscode.window.showWarningMessage("Couldn't parse input as JSON. Assuming plain text and disabling expiration.");
+  }
+
+  try {
+    var token;
+    if (errParsingJSON) {
+      // NOTE: plaintext payloads don't support expiration  
+      token =  jwt.sign(toEncode, config.secret);
+    } else {
+      token =  jwt.sign(toEncode, config.secret, { expiresIn: _duration });
+    }
+
+    ncp.copy(token, function () {
+        var infoMsg = 'Encoded JWT token copied to clipboard!';
+        vscode.window.showInformationMessage(infoMsg);
+    });          
+  } catch (Err) {
+    vscode.window.showInformationMessage("Error encoding to JWT: " + Err);
+  }
 }
 
 function getSelectionText() {
