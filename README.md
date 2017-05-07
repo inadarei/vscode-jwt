@@ -19,7 +19,9 @@ This extension contributes the following settings:
 
 ## Release Notes
 
-Initial release
+### 1.1.0
+
+Major improvement: properly supporting JSON and plain-text payloads.
 
 ### 1.0.0
 

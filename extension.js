@@ -3,13 +3,13 @@ var jwt    = require('jsonwebtoken');
 var ncp = require("copy-paste");
 
 // @see: https://code.visualstudio.com/docs/extensionAPI/extension-points
+// @see: https://tstringer.github.io/nodejs/javascript/vscode/2015/12/14/input-and-output-vscode-ext.html
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
 
     var disposables = [];
-    var secretSignature = "unsigned";
     var config = vscode.workspace.getConfiguration('jwt');
 
     //console.log(config);
@@ -20,13 +20,30 @@ function activate(context) {
         var srcText = getSelectionText();
         if (!srcText) return; // nothing to do
 
+        var toEncode;
+        var errParsingJSON = false;
+
         try {
-          var token =  jwt.sign({
-            "data": srcText
-          }, config.secret, { expiresIn: config.duration });
+            // Let's see if the input is a valid JSON
+            toEncode = JSON.parse(srcText);
+        } catch (Err) {
+            errParsingJSON = true;
+            toEncode = srcText;
+            vscode.window.showInformationMessage("Couldn't parse input as JSON. Assuming plain text and disabling expiration.");
+        }
+
+        try {
+          var token;
+          if (errParsingJSON) {
+            // NOTE: plaintext payloads don't support expiration  
+            token =  jwt.sign(toEncode, config.secret);
+          } else {
+            token =  jwt.sign(toEncode, config.secret, { expiresIn: config.duration });
+          }
 
           ncp.copy(token, function () {
-              vscode.window.showInformationMessage('Encoded JWT token copied to clipboard!');
+              var infoMsg = 'Encoded JWT token copied to clipboard!';
+              vscode.window.showInformationMessage(infoMsg);
           });          
         } catch (Err) {
           vscode.window.showInformationMessage("Error encoding to JWT: " + Err);

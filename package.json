@@ -3,7 +3,7 @@
   "displayName": "JWT Sign/Verify",
   "description": "JSON Web Token (JWT) Sign/Verify Utility.",
   "keywords": ["jwt", "json", "token", "json web token", "encoder"],
-  "version": "1.0.4",
+  "version": "1.1.0",
   "publisher": "inadarei",
   "engines": {
     "vscode": "^1.11.0"
