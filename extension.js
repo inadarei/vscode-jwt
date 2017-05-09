@@ -1,6 +1,7 @@
 var vscode = require('vscode');
 var jwt    = require('jsonwebtoken');
 var ncp = require("copy-paste");
+var fs = require('fs');
 
 // @see: https://code.visualstudio.com/docs/extensionAPI/extension-points
 // @see: https://tstringer.github.io/nodejs/javascript/vscode/2015/12/14/input-and-output-vscode-ext.html
@@ -44,14 +45,16 @@ function activate(context) {
         var srcText = getSelectionText();
         if (!srcText) return; // nothing to do
 
+        var algo = getContextualAlgo(config);
         var opts = {
-          "ingoreExpiration" : true
+          "ingoreExpiration" : true,
+          algorithms: [algo]
         };
 
         jwt.verify(srcText, 
-                    config.pubKey || config.secret,
-                    opts,
-                    function(err, token) {
+                   getContextualSecret(config, 'public'),
+                   opts,
+                   function(err, token) {
           if (err) {
             vscode.window.showInformationMessage("Error decoding from JWT: " + err);
             return;
@@ -87,13 +90,20 @@ function generateToken(config, duration = false) {
       vscode.window.showWarningMessage("Couldn't parse input as JSON. Assuming plain text and disabling expiration.");
   }
 
+  var secret, method;
+  secret = getContextualSecret(config);
+  method = getContextualAlgo(config);
+  vscode.window.showInformationMessage("this is secret: " + secret);
+
+
   try {
     var token;
     if (errParsingJSON) {
       // NOTE: plaintext payloads don't support expiration  
-      token =  jwt.sign(toEncode, config.secret);
+      token =  jwt.sign(toEncode, secret);
     } else {
-      token =  jwt.sign(toEncode, config.secret, { expiresIn: _duration });
+      token =  jwt.sign(toEncode, secret, {expiresIn: _duration, 
+                                           algorithm: method});
     }
 
     ncp.copy(token, function () {
@@ -124,4 +134,38 @@ function getSelectionText() {
     return srcText;
 }
 
+// returns config.secret if symmetric encryption is used 
+// or base64-decoded secret if assymetric (public/private) one is
+function getContextualSecret(config, mode = 'private') {
+
+  var secret;
+
+  // Assuming secret is base64-encoded if pubKey is present since binary RSA
+  // private key is multiline and JSON config of VSCode cannot generally
+  // support multiline value. Users must base64-encode private keys.
+  if (config.pubKey && config.pubKey.length > 1) {
+    if (mode === 'public') {
+      //secret = Buffer.from(config.pubKey, 'base64').toString('utf8');
+      secret = fs.readFileSync(config.pubKey, 'utf8');
+    } else {
+      //secret = Buffer.from(config.secret, 'base64').toString('utf8');
+      secret = fs.readFileSync(config.secret, 'utf8');
+    }
+  } else {
+    secret = config.secret;
+  }
+
+  vscode.window.showInformationMessage("this is config secret:" + secret);
+
+  return secret;
+}
+
+function getContextualAlgo(config) {
+  if (config.pubKey && config.pubKey.length > 1) {
+    return 'RS256';
+  } else {
+    return 'HS256';
+  }
+  
+}
 exports.deactivate = deactivate;
