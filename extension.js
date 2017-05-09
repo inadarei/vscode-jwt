@@ -2,6 +2,7 @@ var vscode = require('vscode');
 var jwt    = require('jsonwebtoken');
 var ncp = require("copy-paste");
 var fs = require('fs');
+var path = require('path');
 
 // @see: https://code.visualstudio.com/docs/extensionAPI/extension-points
 // @see: https://tstringer.github.io/nodejs/javascript/vscode/2015/12/14/input-and-output-vscode-ext.html
@@ -93,8 +94,6 @@ function generateToken(config, duration = false) {
   var secret, method;
   secret = getContextualSecret(config);
   method = getContextualAlgo(config);
-  vscode.window.showInformationMessage("this is secret: " + secret);
-
 
   try {
     var token;
@@ -138,24 +137,23 @@ function getSelectionText() {
 // or base64-decoded secret if assymetric (public/private) one is
 function getContextualSecret(config, mode = 'private') {
 
-  var secret;
+  var secret, pathToKey;
 
-  // Assuming secret is base64-encoded if pubKey is present since binary RSA
-  // private key is multiline and JSON config of VSCode cannot generally
-  // support multiline value. Users must base64-encode private keys.
+  // If there's pubkey present we assume pub/private
+  // encryption and that the values of setting variables
+  // are paths pointing to corresponding files locally.
   if (config.pubKey && config.pubKey.length > 1) {
     if (mode === 'public') {
       //secret = Buffer.from(config.pubKey, 'base64').toString('utf8');
-      secret = fs.readFileSync(config.pubKey, 'utf8');
+      pathToKey = path.normalize(resolveHome(config.pubKey));
     } else {
       //secret = Buffer.from(config.secret, 'base64').toString('utf8');
-      secret = fs.readFileSync(config.secret, 'utf8');
+      pathToKey = path.normalize(resolveHome(config.secret));
     }
+    secret = fs.readFileSync(pathToKey, 'utf8');
   } else {
     secret = config.secret;
   }
-
-  vscode.window.showInformationMessage("this is config secret:" + secret);
 
   return secret;
 }
@@ -168,4 +166,13 @@ function getContextualAlgo(config) {
   }
   
 }
+
+function resolveHome(filepath) {
+    filepath = filepath.trim();
+    if (filepath[0] === '~') {
+        return path.join(process.env.HOME, filepath.slice(1));
+    }
+    return filepath;
+}
+
 exports.deactivate = deactivate;
