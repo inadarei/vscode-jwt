@@ -19,6 +19,29 @@ This extension contributes the following settings:
 * `jwt.pubKey`: A public key for verifying JWT tokens, if using asymmetric verification
 * `jwt.duration`: Duration for JWT tokens. Defaults to "24h"
 
+## Using Public/Secret Keys
+
+If you only set jwt.secret in your settings, the jwt extension will perform
+symmetrical signing/verification using HS256 algorithm.
+
+If you indicate jwt.pubKey in your VS Code settings, jwt extension will
+immediately assume that you are performing assymetrical signing/verificatin and
+will use RS256 algorithm. Please also note that in this scenario, the values of
+jwt.secret and jwt.pubKey are file paths pointing to where you have your public
+and private keys saved locally, e.g.:
+
+```
+"jwt.secret": "~/work/my-keys/jwt.pem",
+"jwt.pubKey": "~/work/my-keys/jwt.pem.pub"
+```
+
+To generate keys that work with RS256, you can run something like the following:
+
+```
+> openssl genrsa -out jwt.pem 2048
+> openssl rsa -in jwt.pem -pubout -out jwt.pem.pub
+```
+
 ## Release Notes
 
 ### 1.2.0
