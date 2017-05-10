@@ -48,7 +48,7 @@ function activate(context) {
 
         var algo = getContextualAlgo(config);
         var opts = {
-          "ingoreExpiration" : true,
+          //"ignoreExpiration" : true,
           algorithms: [algo]
         };
 
