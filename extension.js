@@ -176,3 +176,4 @@ function resolveHome(filepath) {
 }
 
 exports.deactivate = deactivate;
+
