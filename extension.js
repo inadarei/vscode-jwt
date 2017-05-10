@@ -1,6 +1,8 @@
 var vscode = require('vscode');
 var jwt    = require('jsonwebtoken');
 var ncp = require("copy-paste");
+var fs = require('fs');
+var path = require('path');
 
 // @see: https://code.visualstudio.com/docs/extensionAPI/extension-points
 // @see: https://tstringer.github.io/nodejs/javascript/vscode/2015/12/14/input-and-output-vscode-ext.html
@@ -44,14 +46,16 @@ function activate(context) {
         var srcText = getSelectionText();
         if (!srcText) return; // nothing to do
 
+        var algo = getContextualAlgo(config);
         var opts = {
-          "ingoreExpiration" : true
+          //"ignoreExpiration" : true,
+          algorithms: [algo]
         };
 
         jwt.verify(srcText, 
-                    config.pubKey || config.secret,
-                    opts,
-                    function(err, token) {
+                   getContextualSecret(config, 'public'),
+                   opts,
+                   function(err, token) {
           if (err) {
             vscode.window.showInformationMessage("Error decoding from JWT: " + err);
             return;
@@ -87,13 +91,18 @@ function generateToken(config, duration = false) {
       vscode.window.showWarningMessage("Couldn't parse input as JSON. Assuming plain text and disabling expiration.");
   }
 
+  var secret, method;
+  secret = getContextualSecret(config);
+  method = getContextualAlgo(config);
+
   try {
     var token;
     if (errParsingJSON) {
       // NOTE: plaintext payloads don't support expiration  
-      token =  jwt.sign(toEncode, config.secret);
+      token =  jwt.sign(toEncode, secret);
     } else {
-      token =  jwt.sign(toEncode, config.secret, { expiresIn: _duration });
+      token =  jwt.sign(toEncode, secret, {expiresIn: _duration, 
+                                           algorithm: method});
     }
 
     ncp.copy(token, function () {
@@ -122,6 +131,48 @@ function getSelectionText() {
     }
 
     return srcText;
+}
+
+// returns config.secret if symmetric encryption is used 
+// or base64-decoded secret if assymetric (public/private) one is
+function getContextualSecret(config, mode = 'private') {
+
+  var secret, pathToKey;
+
+  // If there's pubkey present we assume pub/private
+  // encryption and that the values of setting variables
+  // are paths pointing to corresponding files locally.
+  if (config.pubKey && config.pubKey.length > 1) {
+    if (mode === 'public') {
+      //secret = Buffer.from(config.pubKey, 'base64').toString('utf8');
+      pathToKey = path.normalize(resolveHome(config.pubKey));
+    } else {
+      //secret = Buffer.from(config.secret, 'base64').toString('utf8');
+      pathToKey = path.normalize(resolveHome(config.secret));
+    }
+    secret = fs.readFileSync(pathToKey, 'utf8');
+  } else {
+    secret = config.secret;
+  }
+
+  return secret;
+}
+
+function getContextualAlgo(config) {
+  if (config.pubKey && config.pubKey.length > 1) {
+    return 'RS256';
+  } else {
+    return 'HS256';
+  }
+  
+}
+
+function resolveHome(filepath) {
+    filepath = filepath.trim();
+    if (filepath[0] === '~') {
+        return path.join(process.env.HOME, filepath.slice(1));
+    }
+    return filepath;
 }
 
 exports.deactivate = deactivate;
