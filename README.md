@@ -44,6 +44,10 @@ To generate keys that work with RS256, you can run something like the following:
 
 ## Release Notes
 
+### 1.3.0
+
+Full support of assymetrical signing with public/private keys.
+
 ### 1.2.0
 
 Added command with duration presets to easily generate tokens of various durations.
