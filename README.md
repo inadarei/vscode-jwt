@@ -1,6 +1,7 @@
 # JWT Extension for VS Code
 
-[![Code Climate Badge][codeclimate-img]][codeclimate-url]
+[![Codacy Badge][codacy-img]][codacy-url]
+
 
 Makes it easy to sign (generate) and verify (decode) JWT tokens in VS Code.
 
@@ -68,5 +69,5 @@ Initial release.
 
 [MIT](LICENSE)
 
-[codeclimate-img]: https://codeclimate.com/github/inadarei/vscode-jwt/badges/gpa.svg
-[codeclimate-url]: https://codeclimate.com/github/inadarei/vscode-jwt
+[codacy-img]: https://api.codacy.com/project/badge/Grade/94d7b048519b405384528013499d2808
+[codacy-url]: https://www.codacy.com/app/irakli/vscode-jwt?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=inadarei/vscode-jwt&amp;utm_campaign=Badge_Grade
